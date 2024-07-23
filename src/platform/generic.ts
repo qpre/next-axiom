@@ -6,6 +6,8 @@ import type Provider from "./base";
 // This is the generic config class for all platforms that doesn't have a special
 // implementation (e.g: vercel, netlify). All config classes extends this one.
 export default class GenericConfig implements Provider {
+  proxyUrl = process.env.NEXT_PUBLIC_AXIOM_PROXY_URL || undefined;
+  useProxyOnBrowser = process.env.NEXT_PUBLIC_AXIOM_USE_PROXY === "true" ? true : process.env.NEXT_PUBLIC_AXIOM_USE_PROXY === "false" ? false : true
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
   shoudSendEdgeReport = false;
@@ -24,11 +26,11 @@ export default class GenericConfig implements Provider {
   }
 
   getLogsEndpoint(): string {
-    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
+    return this.useProxyOnBrowser && this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.logs);
   }
 
   getWebVitalsEndpoint(): string {
-    return this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
+    return this.useProxyOnBrowser && this.isBrowser ? `${this.proxyPath}/logs` : this.getIngestURL(EndpointType.webVitals);
   }
 
   wrapWebVitalsObject(metrics: any[]): any {
